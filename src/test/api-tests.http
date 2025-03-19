@@ -1,14 +1,1 @@
-### GET alle Employees
-GET http://localhost:8080/api/employees
-Accept: application/json
 
-### POST Neuen Employee erstellen
-POST http://localhost:8080/api/employees
-Content-Type: application/json
-
-{
-  "firstName": "Max",
-  "lastName": "Mustermann",
-  "email": "max@example.com",
-  "password": "password123",
-}
