@@ -1,8 +1,10 @@
 package com.empfehlo.empfehlungsapp.controllers;
 
+import com.empfehlo.empfehlungsapp.models.LoginRequest;
 import com.empfehlo.empfehlungsapp.models.User;
 import com.empfehlo.empfehlungsapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,8 +57,9 @@ public class UserController {
      * ✅ Login für alle Nutzer (Mitarbeiter & HR)
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestParam String username, @RequestParam String password) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+    //ToDo: evtl @RequestBody statt @RequestParam, wenn Login-Request als JSON(im Body) vesrendet werden soll
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(401).body("⚠ Benutzer nicht gefunden!");
@@ -65,8 +68,8 @@ public class UserController {
         User user = userOptional.get();
 
         // Hier das Klartext-Passwort mit dem gespeicherten (gehashten) Passwort vergleichen
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.status(401).body("⚠ Ungültige Anmeldedaten!");
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("⚠ Ungültige Anmeldedaten!");
         }
 
         return ResponseEntity.ok("✅ Login erfolgreich! Willkommen, " + user.getUsername());
