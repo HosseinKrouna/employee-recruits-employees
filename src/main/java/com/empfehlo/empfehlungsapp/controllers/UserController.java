@@ -57,7 +57,6 @@ public class UserController {
      * ✅ Login für alle Nutzer (Mitarbeiter & HR)
      */
     @PostMapping("/login")
-    //ToDo: evtl @RequestBody statt @RequestParam, wenn Login-Request als JSON(im Body) vesrendet werden soll
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
