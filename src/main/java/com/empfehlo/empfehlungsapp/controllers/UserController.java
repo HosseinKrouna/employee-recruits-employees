@@ -1,5 +1,6 @@
 package com.empfehlo.empfehlungsapp.controllers;
 
+import com.empfehlo.empfehlungsapp.dtos.LoginResponseDTO;
 import com.empfehlo.empfehlungsapp.models.LoginRequest;
 import com.empfehlo.empfehlungsapp.models.User;
 import com.empfehlo.empfehlungsapp.repositories.UserRepository;
@@ -55,21 +56,28 @@ public class UserController {
      * ✅ Login für alle Nutzer (Mitarbeiter & HR)
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(401).body("⚠ Benutzer nicht gefunden!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Benutzer nicht gefunden!");
         }
 
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("⚠ Ungültige Anmeldedaten!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten!");
         }
 
-        return ResponseEntity.ok("✅ Login erfolgreich! Willkommen, " + user.getUsername());
+        LoginResponseDTO response = new LoginResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
