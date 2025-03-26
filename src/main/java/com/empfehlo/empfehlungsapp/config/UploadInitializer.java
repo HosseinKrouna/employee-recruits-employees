@@ -6,31 +6,49 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 @Component
-public class UploadDirectoryInitializer {
+public class UploadInitializer {
 
     private String uploadDir;
 
     @PostConstruct
-    public void createUploadDir() {
-        String userHome = System.getProperty("user.home");
+    public void init() {
+        String projectDir = System.getProperty("user.dir");
 
-        uploadDir = userHome + File.separator + "empfehlo_uploads";
+        uploadDir = projectDir + File.separator + "uploads";
 
         File dir = new File(uploadDir);
         if (!dir.exists()) {
             boolean created = dir.mkdirs();
             if (created) {
-                System.out.println("📂 Upload-Verzeichnis erstellt unter: " + uploadDir);
+                System.out.println("📁 Upload-Verzeichnis angelegt: " + uploadDir);
             } else {
-                System.err.println("⚠️ Upload-Verzeichnis konnte nicht erstellt werden!");
+                System.err.println("❌ Upload-Verzeichnis konnte nicht erstellt werden!");
             }
         } else {
             System.out.println("✅ Upload-Verzeichnis existiert bereits: " + uploadDir);
         }
 
+        System.setProperty("app.upload.dir", uploadDir);
     }
 
     public String getUploadDir() {
         return uploadDir;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
