@@ -1,12 +1,17 @@
 package com.empfehlo.empfehlungsapp.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @RestController
@@ -44,14 +49,19 @@ public class FileUploadController {
 
     // (Optional) GET für späteren Download z. B. für HR
     @GetMapping("/download/{filename}")
-    public ResponseEntity<?> downloadFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
         File file = new File(uploadDir + File.separator + filename);
         if (!file.exists()) {
             return ResponseEntity.notFound().build();
         }
 
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .body(file);
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(file.length())
+                .body(resource);
     }
+
 }

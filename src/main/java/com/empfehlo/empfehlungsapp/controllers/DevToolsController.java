@@ -23,5 +23,15 @@ public class DevToolsController {
         userRepository.deleteAll();
         return ResponseEntity.ok("✅ Alle Testdaten gelöscht.");
     }
+
+    // Nur Benutzer löschen
+    @DeleteMapping("/reset-users")
+    public ResponseEntity<String> resetUsersOnly() {
+        recommendationRepository.deleteAll(); // zuerst abhängige Empfehlungen löschen
+        userRepository.deleteAll();           // dann Benutzer
+        return ResponseEntity.ok("✅ Benutzer & zugehörige Empfehlungen gelöscht.");
+    }
+
 }
+
 
