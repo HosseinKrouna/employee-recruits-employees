@@ -7,7 +7,7 @@ public class RecommendationRequestDTO {
     private String candidateLastname;
     private String position;
     private String documentCvPath;
-    private String documentCoverLetterPath;
+
 
 
     public Long getUserId() {
@@ -50,11 +50,4 @@ public class RecommendationRequestDTO {
         this.documentCvPath = documentCvPath;
     }
 
-    public String getDocumentCoverLetterPath() {
-        return documentCoverLetterPath;
-    }
-
-    public void setDocumentCoverLetterPath(String documentCoverLetterPath) {
-        this.documentCoverLetterPath = documentCoverLetterPath;
-    }
 }

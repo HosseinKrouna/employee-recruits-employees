@@ -1,5 +1,3 @@
-
-
 package com.empfehlo.empfehlungsapp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,10 +17,7 @@ public class Recommendation {
     private String candidateLastname;
     private String position;
     private String status;
-
     private String documentCvPath;
-    private String documentCoverLetterPath;
-
     private LocalDateTime submittedAt;
 
     @JoinColumn(name = "user_id", nullable = false)
@@ -45,9 +40,6 @@ public class Recommendation {
 
     public String getDocumentCvPath() { return documentCvPath; }
     public void setDocumentCvPath(String documentCvPath) { this.documentCvPath = documentCvPath; }
-
-    public String getDocumentCoverLetterPath() { return documentCoverLetterPath; }
-    public void setDocumentCoverLetterPath(String documentCoverLetterPath) { this.documentCoverLetterPath = documentCoverLetterPath; }
 
     public LocalDateTime getSubmittedAt() { return submittedAt; }
     public void setSubmittedAt(LocalDateTime submittedAt) { this.submittedAt = submittedAt; }
