@@ -8,7 +8,6 @@ public class RecommendationResponseDTO {
     private String position;
     private String status;
     private String documentCvPath;
-    private String documentCoverLetterPath;
     private String submittedAt;
     private Long userId;
     private String recommendedByUsername;
@@ -60,14 +59,6 @@ public class RecommendationResponseDTO {
 
     public void setDocumentCvPath(String documentCvPath) {
         this.documentCvPath = documentCvPath;
-    }
-
-    public String getDocumentCoverLetterPath() {
-        return documentCoverLetterPath;
-    }
-
-    public void setDocumentCoverLetterPath(String documentCoverLetterPath) {
-        this.documentCoverLetterPath = documentCoverLetterPath;
     }
 
     public String getSubmittedAt() {
