@@ -1,54 +1,40 @@
 package com.empfehlo.empfehlungsapp.config;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 public class UploadInitializer {
 
-    private String uploadDir;
+    private static final Logger log = LoggerFactory.getLogger(UploadInitializer.class);
+    private Path uploadDir;
 
     @PostConstruct
     public void init() {
-        String projectDir = System.getProperty("user.dir");
+        uploadDir = Paths.get(System.getProperty("user.dir"), "uploads");
 
-        uploadDir = projectDir + File.separator + "uploads";
-
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            boolean created = dir.mkdirs();
-            if (created) {
-                System.out.println("📁 Upload-Verzeichnis angelegt: " + uploadDir);
+        try {
+            if (Files.notExists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+                log.info("📁 Upload-Verzeichnis angelegt: {}", uploadDir);
             } else {
-                System.err.println("❌ Upload-Verzeichnis konnte nicht erstellt werden!");
+                log.info("✅ Upload-Verzeichnis existiert bereits: {}", uploadDir);
             }
-        } else {
-            System.out.println("✅ Upload-Verzeichnis existiert bereits: " + uploadDir);
+        } catch (IOException e) {
+            log.error("❌ Upload-Verzeichnis konnte nicht erstellt werden!", e);
         }
 
-        System.setProperty("app.upload.dir", uploadDir);
+        System.setProperty("app.upload.dir", uploadDir.toString());
     }
 
-    public String getUploadDir() {
+    public Path getUploadDir() {
         return uploadDir;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

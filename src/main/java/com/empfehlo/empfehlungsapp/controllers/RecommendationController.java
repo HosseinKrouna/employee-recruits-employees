@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,11 +19,8 @@ import java.util.Optional;
 @RequestMapping("/api/recommendations")
 public class RecommendationController {
 
-    @Autowired
-    private RecommendationRepository recommendationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private RecommendationRepository recommendationRepository;
+    @Autowired private UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<?> createRecommendation(@RequestBody RecommendationRequestDTO dto) {
@@ -41,47 +37,43 @@ public class RecommendationController {
     }
 
 
+
+
     @GetMapping
     public ResponseEntity<List<RecommendationResponseDTO>> getAll() {
-        List<Recommendation> entities = recommendationRepository.findAll();
-        List<RecommendationResponseDTO> dtos = entities.stream()
+        List<RecommendationResponseDTO> dtos = recommendationRepository.findAll().stream()
                 .map(RecommendationMapper::toDTO)
                 .toList();
-
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/by-user/{userId}")
-    public ResponseEntity<List<RecommendationResponseDTO>> getByUser(@PathVariable Long userId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<Recommendation> recommendations = recommendationRepository.findByRecommendedBy(userOpt.get());
-
-        List<RecommendationResponseDTO> dtos = recommendations.stream()
-                .map(RecommendationMapper::toDTO)
-                .toList();
-
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<?> getByUser(@PathVariable Long userId) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    List<RecommendationResponseDTO> dtos = recommendationRepository.findByRecommendedBy(user).stream()
+                            .map(RecommendationMapper::toDTO)
+                            .toList();
+                    return ResponseEntity.ok(dtos);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Recommendation> updateRecommendation(@PathVariable Long id, @RequestBody Recommendation recommendationDetails) {
-        Optional<Recommendation> optionalRecommendation = recommendationRepository.findById(id);
-        if (optionalRecommendation.isPresent()) {
-            Recommendation recommendation = optionalRecommendation.get();
-            recommendation.setCandidateFirstname(recommendationDetails.getCandidateFirstname());
-            recommendation.setCandidateLastname(recommendationDetails.getCandidateLastname());
-            recommendation.setPosition(recommendationDetails.getPosition());
-            recommendation.setStatus(recommendationDetails.getStatus());
+    public ResponseEntity<?> updateRecommendation(@PathVariable Long id, @RequestBody Recommendation recommendationDetails) {
+        return recommendationRepository.findById(id)
+                .map(existing -> {
+                    updateEntity(existing, recommendationDetails);
+                    return ResponseEntity.ok(recommendationRepository.save(existing));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-            recommendationRepository.save(recommendation);
-            return ResponseEntity.ok(recommendation);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    private void updateEntity(Recommendation existing, Recommendation details) {
+        existing.setCandidateFirstname(details.getCandidateFirstname());
+        existing.setCandidateLastname(details.getCandidateLastname());
+        existing.setPosition(details.getPosition());
+        existing.setStatus(details.getStatus());
     }
 
     @DeleteMapping("/{id}")
@@ -94,3 +86,8 @@ public class RecommendationController {
         }
     }
 }
+
+
+
+
+

@@ -7,7 +7,6 @@ import com.empfehlo.empfehlungsapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,79 +17,62 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    /**
-     * ✅ Mitarbeiter-Registrierung (Kann nur über JavaFX genutzt werden)
-     */
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("⚠ Benutzer existiert bereits!");
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return ResponseEntity.ok("✅ Mitarbeiter-Registrierung erfolgreich!");
+        return registerUser(user, "MITARBEITER");
     }
 
-    /**
-     * ✅ HR-Registrierung (Kann nur über Postman genutzt werden)
-     */
     @PostMapping("/register-hr")
     public ResponseEntity<String> registerHR(@RequestBody User user) {
+        return registerUser(user, "HR");
+    }
+
+    private ResponseEntity<String> registerUser(User user, String role) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("⚠ Benutzer existiert bereits!");
         }
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(role);
         userRepository.save(user);
-        return ResponseEntity.ok("✅ HR-Konto erstellt!");
+
+        String successMessage = role.equals("HR") ?
+                "✅ HR-Konto erstellt!" :
+                "✅ Mitarbeiter-Registrierung erfolgreich!";
+
+        return ResponseEntity.ok(successMessage);
     }
 
-    /**
-     * ✅ Login für alle Nutzer (Mitarbeiter & HR)
-     */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Benutzer nicht gefunden!");
-        }
-
-        User user = userOptional.get();
-
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        if (userOptional.isEmpty() || !isPasswordValid(userOptional.get(), loginRequest.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten!");
         }
 
-        LoginResponseDTO response = new LoginResponseDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getRole()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(toLoginResponse(userOptional.get()));
     }
 
+    private boolean isPasswordValid(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    private LoginResponseDTO toLoginResponse(User user) {
+        return new LoginResponseDTO(user.getId(), user.getUsername(), user.getRole());
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userRepository.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> userOpt = userRepository.findById(id);
-        return userOpt.map(ResponseEntity::ok)
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-
 }
