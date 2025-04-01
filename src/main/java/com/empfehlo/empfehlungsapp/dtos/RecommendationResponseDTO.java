@@ -8,18 +8,23 @@ public class RecommendationResponseDTO {
     private String position;
     private String status;
     private String documentCvPath;
+    private String documentPdfPath;
     private String submittedAt;
     private Long userId;
     private String recommendedByUsername;
 
 
-    public Long getId() {
-        return id;
-    }
 
     public void setId(Long id) {
         this.id = id;
     }
+    public Long getId() {
+        return id;
+    }
+
+    public String getDocumentPdfPath() { return documentPdfPath; }
+
+    public void setDocumentPdfPath(String documentPdfPath) { this.documentPdfPath = documentPdfPath; }
 
     public String getCandidateFirstname() {
         return candidateFirstname;
