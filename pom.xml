@@ -36,6 +36,10 @@
                 <artifactId>flying-saucer-pdf-openpdf</artifactId>
                 <version>9.1.22</version>
             </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
             <dependency>
                 <groupId>com.github.librepdf</groupId>
                 <artifactId>openpdf</artifactId>
