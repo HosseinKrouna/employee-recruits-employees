@@ -49,5 +49,29 @@ public class FileDownloadController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/download-generated/{filename}")
+    public ResponseEntity<Resource> downloadGeneratedFile(@PathVariable String filename) {
+        Path filePath = Paths.get(System.getProperty("user.dir"), "generatedPdf").resolve(filename);
+
+        if (Files.notExists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Resource resource = new UrlResource(filePath.toUri());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(Files.size(filePath))
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            return ResponseEntity.internalServerError().build();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
 }
 
