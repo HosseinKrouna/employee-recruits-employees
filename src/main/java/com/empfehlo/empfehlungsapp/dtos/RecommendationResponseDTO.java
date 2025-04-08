@@ -12,6 +12,15 @@ public class RecommendationResponseDTO {
     private String submittedAt;
     private Long userId;
     private String recommendedByUsername;
+    private String cvChoice;
+    private String cvLink;
+
+    public String getCvChoice() { return cvChoice; }
+    public void setCvChoice(String cvChoice) { this.cvChoice = cvChoice; }
+
+    public String getCvLink() { return cvLink; }
+    public void setCvLink(String cvLink) { this.cvLink = cvLink; }
+
 
 
 

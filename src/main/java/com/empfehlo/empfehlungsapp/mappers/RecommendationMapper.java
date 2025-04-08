@@ -22,6 +22,9 @@ public class RecommendationMapper {
                 ? entity.getSubmittedAt().toString()
                 : null);
 
+        dto.setCvChoice(entity.getCvChoice());
+        dto.setCvLink(entity.getCvLink());
+
         if (entity.getRecommendedBy() != null) {
             User user = entity.getRecommendedBy();
             dto.setUserId(user.getId());
@@ -37,6 +40,8 @@ public class RecommendationMapper {
         entity.setCandidateLastname(dto.getCandidateLastname());
         entity.setPosition(dto.getPosition());
         entity.setDocumentCvPath(dto.getDocumentCvPath());
+        entity.setCvChoice(dto.getCvChoice());
+        entity.setCvLink(dto.getCvLink());
         entity.setDocumentPdfPath(dto.getDocumentPdfPath());
         entity.setRecommendedBy(user);
         return entity;
