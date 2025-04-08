@@ -1,326 +1,303 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
 <head>
     <meta charset="UTF-8"/>
-    <title>Empfehlungsformular</title>
-    <style type="text/css">
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            color: #333;
-        }
+    <title>MWM-Formular</title>
+    <style>
+        @page { size: A4; margin: 1cm; }
+        @font-face {
+        font-family: 'Montserrat';
+        src: url('fonts/Montserrat-ExtraBold.ttf');
+        -fs-pdf-font-embed: embed;
+    }
+
+        body { font-family: Arial, sans-serif; margin: 40px; color: #333; position: relative; }
         .header {
-            text-align: center;
-            margin-bottom: 30px;
+           position: relative;
+           min-height: 120px;
         }
-        .header h1 {
-            color: #2c3e50;
-            margin-bottom: 5px;
+
+        .header-logo {
+           position: absolute;
+           top: -313px;
+           right: -480px;
+           width: 1144px;
+            height: auto;
         }
-        .section {
-            margin-bottom: 25px;
-        }
-        .section h2 {
-            color: #3498db;
-            border-bottom: 1px solid #3498db;
-            padding-bottom: 5px;
-            font-size: 18px;
-        }
-        .data-row {
-            margin: 10px 0;
-            display: flex;
-        }
-        .label {
-            font-weight: bold;
-            width: 200px;
-        }
-        .value {
-            flex: 1;
-        }
-        .checkbox-list {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .checkbox-item {
-            width: 200px;
-            margin: 5px 0;
-        }
-        .checkbox-checked {
-            color: #2ecc71;
-        }
-        .checkbox-unchecked {
-            color: #e74c3c;
-        }
-        .skills-section {
-            margin-top: 15px;
-        }
-        .skill-category {
-            margin-bottom: 15px;
-        }
-        .skill-category h3 {
-            color: #7f8c8d;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        .skill-bar {
-            height: 20px;
-            background-color: #ecf0f1;
-            margin-bottom: 10px;
-            position: relative;
-        }
-        .skill-progress {
-            height: 100%;
-            background-color: #3498db;
+
+        h1 { font-family: 'Montserrat', Arial, sans-serif; font-size: 24pt; color: #008aff; margin-bottom: 0; position: relative; }
+        .mwm-color-line {
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 230px;
+            height: 12px;
+            background-color: #f9a949;
+            left: 82px;
+            top: 29px;
+            z-index: -1;
         }
-        .skill-name {
-            position: absolute;
-            left: 10px;
-            top: 0;
-            line-height: 20px;
-            color: #000;
-        }
-        .skill-percent {
-            position: absolute;
-            right: 10px;
-            top: 0;
-            line-height: 20px;
-            color: #000;
-        }
-        .page-break {
-            page-break-before: always;
-        }
+
+        h2 { color: #008aff; border-bottom: 2px solid #f9a949; padding-bottom: 5px; font-size: 18px; margin-top: 30px; }
+        h3 { font-size: 16px; margin-top: 2px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        td { padding: 6px; vertical-align: top; }
+        .label { font-weight: bold; width: 25%; }
+        .value { width: 25%; }
+        .checkbox-columns { display: flex; justify-content: space-between; gap: 40px; }
+        .checkbox-column { display: flex; flex-direction: column; gap: 8px; }
+        .checkbox-item { display: flex; align-items: center; }
+
+.checkbox {
+    font-family: Arial, sans-serif;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #333;
+    margin-right: 8px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 14px;
+    color: #000;
+}
+
+.checkbox.checked {
+    background-color: #008aff;
+    color: #fff;
+    font-weight: bold;
+}
+
+.skill-category {
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+
+
+.skill-bar {
+    position: relative;
+    background-color: #bfbfbf;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    height: 24px;
+    margin: 5px 0 2px 0;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.skill-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #008aff;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    z-index: -1;
+}
+
+.skill-name,
+.skill-percent {
+    position: absolute;
+    top: 3px;
+    font-weight: bold;
+    color: #ffffff;
+    z-index: 3;
+}
+
+.skill-name { left: 10px; }
+.skill-percent { right: 10px; }
+
+
+
+        .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1>Empfehlungsformular</h1>
-    <p th:text="'Erstellt am ' + ${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}"></p>
+    <img class="header-logo" src="images/nterra-logo.png" alt="Logo"/>
+    <div style="position: relative;">
+        <h1>Dein MWM-Kontakt</h1>
+        <div class="mwm-color-line"></div>
+    </div>
+    <h3>Mitarbeiter werben Mitarbeiter</h3>
+    <p th:text="'Erstellt am ' + ${#dates.format(#dates.createNow(), 'dd.MM.yyyy')}"></p>
 </div>
 
-<div class="section">
-    <h2>Kandidateninformationen</h2>
-    <div class="data-row">
-        <div class="label">Name:</div>
-        <div class="value" th:text="${recommendation.candidateFirstname + ' ' + recommendation.candidateLastname}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Position:</div>
-        <div class="value" th:text="${recommendation.position}"></div>
-    </div>
-</div>
+<h2>Persönliche Infos des Kontaktes</h2>
+<table>
+    <tr>
+        <td class="label">Bevorzugte Position:</td>
+        <td class="value" th:text="${recommendation.position}"></td>
+        <td class="label">Beschäftigungsstatus:</td>
+        <td class="value" th:text="${recommendation.employmentStatus}"></td>
+    </tr>
+    <tr>
+        <td class="label">Vorname:</td>
+        <td class="value" th:text="${recommendation.candidateFirstname}"></td>
+        <td class="label">Nachname:</td>
+        <td class="value" th:text="${recommendation.candidateLastname}"></td>
+    </tr>
+    <tr>
+        <td class="label">E-Mail:</td>
+        <td class="value" th:text="${recommendation.email}"></td>
+        <td class="label">Handynummer:</td>
+        <td class="value" th:text="${recommendation.phone}"></td>
+    </tr>
+    <tr>
+        <td class="label">Woher kennt ihr euch?</td>
+        <td class="value" th:text="${recommendation.knownFrom}"></td>
+    </tr>
+    <tr>
+        <td class="label">Erstkontakt am:</td>
+        <td class="value" th:text="${contactDateFormatted}"></td>
+        <td class="label">Überzeugt am:</td>
+        <td class="value" th:text="${convincedDateFormatted}"></td>
+    </tr>
+</table>
 
-<div class="section">
-    <h2>Kontakt &amp; Kennenlernen</h2>
-    <div class="data-row">
-        <div class="label">E-Mail:</div>
-        <div class="value" th:text="${recommendation.email}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Telefon:</div>
-        <div class="value" th:text="${recommendation.phone}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Bekannt durch:</div>
-        <div class="value" th:text="${recommendation.knownFrom}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Kontaktdatum:</div>
-        <div class="value" th:text="${contactDateFormatted}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Überzeugt am:</div>
-        <div class="value" th:text="${convincedDateFormatted}"></div>
-    </div>
-</div>
-
-<div class="section">
-    <h2>Aktuelle oder letzte Position</h2>
-    <div class="data-row">
-        <div class="label">Beschäftigungsstatus:</div>
-        <div class="value" th:text="${recommendation.employmentStatus}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Aktuelle Position:</div>
-        <div class="value" th:text="${recommendation.currentPosition}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Aktuelles Karrierelevel:</div>
-        <div class="value" th:text="${recommendation.currentCareerLevel}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Letzte Position:</div>
-        <div class="value" th:text="${recommendation.lastPosition}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Letztes Karrierelevel:</div>
-        <div class="value" th:text="${recommendation.lastCareerLevel}"></div>
-    </div>
-</div>
-
-<div class="section">
-    <h2>Informiert über</h2>
-    <div class="checkbox-list">
+<h2>Kontakt ist informiert zu:</h2>
+<div class="checkbox-columns">
+    <div class="checkbox-column">
         <div class="checkbox-item">
-                <span th:class="${informed.position ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.position ? '✓' : '✗'}"></span>
-            <span> Position</span>
+            <span th:text="${informed['position']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['position']} ? 'checked' : '')"></span>
+            <span>Position</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.tasks ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.tasks ? '✓' : '✗'}"></span>
-            <span> Aufgaben</span>
+            <span th:text="${informed['tasks']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['tasks']} ? 'checked' : '')"></span>
+            <span>Aufgaben</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.requirements ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.requirements ? '✓' : '✗'}"></span>
-            <span> Anforderungen</span>
+            <span th:text="${informed['requirements']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['requirements']} ? 'checked' : '')"></span>
+            <span>Anforderungen</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.clientsProjects ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.clientsProjects ? '✓' : '✗'}"></span>
-            <span> Kunden/Projekte</span>
+            <span th:text="${informed['clientsProjects']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['clientsProjects']} ? 'checked' : '')"></span>
+            <span>Kunden und Projekte</span>
+        </div>
+    </div>
+    <div class="checkbox-column">
+        <div class="checkbox-item">
+            <span th:text="${informed['benefits']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['benefits']} ? 'checked' : '')"></span>
+            <span>Benefits</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.benefits ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.benefits ? '✓' : '✗'}"></span>
-            <span> Benefits</span>
+            <span th:text="${informed['training']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['training']} ? 'checked' : '')"></span>
+            <span>Weiterbildung</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.training ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.training ? '✓' : '✗'}"></span>
-            <span> Weiterbildung</span>
+            <span th:text="${informed['coach']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['coach']} ? 'checked' : '')"></span>
+            <span>Karrierecoach</span>
         </div>
         <div class="checkbox-item">
-                <span th:class="${informed.coach ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.coach ? '✓' : '✗'}"></span>
-            <span> Coach</span>
-        </div>
-        <div class="checkbox-item">
-                <span th:class="${informed.roles ? 'checkbox-checked' : 'checkbox-unchecked'}"
-                      th:text="${informed.roles ? '✓' : '✗'}"></span>
-            <span> Rollen</span>
+            <span th:text="${informed['roles']} ? 'X' : ''"
+                  th:class="'checkbox ' + (${informed['roles']} ? 'checked' : '')"></span>
+            <span>Rollen</span>
         </div>
     </div>
 </div>
 
-<div class="section">
-    <h2>Eckdaten</h2>
-    <div class="data-row">
-        <div class="label">Berufserfahrung (Jahre):</div>
-        <div class="value" th:text="${recommendation.experienceYears != null ? recommendation.experienceYears : '-'}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Kündigungsfrist bis:</div>
-        <div class="value" th:text="${noticePeriodFormatted != null ? noticePeriodFormatted : '-'}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Möglicher Starttermin:</div>
-        <div class="value" th:text="${startDateFormatted != null ? startDateFormatted : '-'}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Gehaltsvorstellung:</div>
-        <div class="value" th:text="${recommendation.salaryExpectation != null ? recommendation.salaryExpectation + ' €' : '-'}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Arbeitszeit:</div>
-        <div class="value" th:text="${recommendation.workHours}"></div>
-    </div>
-    <div class="data-row">
-        <div class="label">Reisebereitschaft (%):</div>
-        <div class="value" th:text="${recommendation.travelWillingness != null ? recommendation.travelWillingness + '%' : '-'}"></div>
-    </div>
-</div>
 
-<!-- Seitenumbruch vor den Skills -->
+<h2>Eckdaten</h2>
+<table>
+    <tr th:if="${recommendation.employmentStatus == 'In Anstellung'}">
+        <td class="label">Aktuelle Position:</td>
+        <td class="value" th:text="${recommendation.currentPosition}"></td>
+    </tr>
+    <tr th:if="${recommendation.employmentStatus == 'In Anstellung'}">
+        <td class="label">Karrierelevel:</td>
+        <td class="value" th:text="${recommendation.currentCareerLevel}"></td>
+    </tr>
+
+    <tr th:if="${recommendation.employmentStatus != 'In Anstellung'}">
+        <td class="label">Letzte Position:</td>
+        <td class="value" th:text="${recommendation.lastPosition}"></td>
+    </tr>
+    <tr th:if="${recommendation.employmentStatus != 'In Anstellung'}">
+        <td class="label">Letzter Karrierelevel:</td>
+        <td class="value" th:text="${recommendation.lastCareerLevel}"></td>
+    </tr>
+
+    <tr>
+        <td class="label">Berufserfahrung (in Jahren):</td>
+        <td class="value" th:text="${recommendation.experienceYears}"></td>
+    </tr>
+    <tr>
+        <td class="label">Kündigungsfrist:</td>
+        <td class="value" th:text="${noticePeriodFormatted}"></td>
+        <td class="label">Starttermin:</td>
+        <td class="value" th:text="${startDateFormatted}"></td>
+    </tr>
+    <tr>
+        <td class="label">Gehaltsvorstellung (in €):</td>
+        <td class="value" th:text="${recommendation.salaryExpectation}"></td>
+        <td class="label">Stundenanzahl (VZ/TZ):</td>
+        <td class="value" th:text="${recommendation.workHours}"></td>
+        <td class="label">Reisebereitschaft (%):</td>
+        <td class="value" th:text="${recommendation.travelWillingness}"></td>
+    </tr>
+</table>
+
 <div class="page-break"></div>
+<h2>Weitere Infos</h2>
+<div>
+    <p>
+        <strong>CV-Übermittlung:</strong>
+        <span th:text="${recommendation.cvChoice}"></span>
+    </p>
 
-<div class="section">
-    <h2>Skills (technologisch)</h2>
-
-    <div class="skill-category" th:if="${recommendation.backendSkills != null && !recommendation.backendSkills.empty}">
-        <h3>Backend</h3>
-        <div th:each="skill : ${recommendation.backendSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
-        </div>
+    <!-- Wenn Business-Profil-Link verwendet wurde -->
+    <div th:if="${recommendation.cvChoice == 'CV im Business-Profil-Link enthalten'} and ${recommendation.cvLink != null} and ${!#strings.isEmpty(recommendation.cvLink)}">
+        <p>
+            <strong>Business-Profil-Link:</strong>
+            <a th:href="${recommendation.cvLink}" th:text="${recommendation.cvLink}" target="_blank"></a>
+        </p>
     </div>
 
-    <div class="skill-category" th:if="${recommendation.frontendSkills != null && !recommendation.frontendSkills.empty}">
-        <h3>Frontend</h3>
-        <div th:each="skill : ${recommendation.frontendSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
-        </div>
+    <!-- Wenn "CV hochladen" gewählt wurde -->
+    <div th:if="${recommendation.cvChoice == 'CV hochladen'}">
+        <p><em>Der CV wurde direkt hochgeladen und liegt als Datei vor.</em></p>
     </div>
 
-    <div class="skill-category" th:if="${recommendation.databaseSkills != null && !recommendation.databaseSkills.empty}">
-        <h3>Datenbanken</h3>
-        <div th:each="skill : ${recommendation.databaseSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
-        </div>
+    <!-- Wenn "CV per E-Mail" gewählt wurde -->
+    <div th:if="${recommendation.cvChoice == 'CV per E-Mail'}">
+        <p><em>Der CV wird separat per E-Mail übermittelt.</em></p>
     </div>
+</div>
 
-    <div class="skill-category" th:if="${recommendation.buildSkills != null && !recommendation.buildSkills.empty}">
-        <h3>Build-Tools</h3>
-        <div th:each="skill : ${recommendation.buildSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
-        </div>
-    </div>
 
-    <div class="skill-category" th:if="${recommendation.cicdSkills != null && !recommendation.cicdSkills.empty}">
-        <h3>CI/CD</h3>
-        <div th:each="skill : ${recommendation.cicdSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
-        </div>
-    </div>
+<h2>Skills (technologisch)</h2>
+<div th:each="categoryEntry : ${skillsMap}">
+    <h3 class="skill-category" th:text="${categoryEntry.key}"></h3>
 
-    <div class="skill-category" th:if="${recommendation.customSkills != null && !recommendation.customSkills.empty}">
-        <h3>Weitere Skills</h3>
-        <div th:each="skill : ${recommendation.customSkills}" class="skill-bar">
-            <div class="skill-progress" th:style="'width: ' + ${skill.percentage} + '%'"></div>
-            <span class="skill-name" th:text="${skill.name}"></span>
-            <span class="skill-percent" th:text="${skill.percentage} + '%'"></span>
+    <div th:each="entry : ${categoryEntry.value}" th:if="${entry.key != 'Andere'}">
+        <div class="skill-bar">
+            <div th:if="${entry.value != null}">
+                <div class="skill-progress" th:style="'width:' + ${entry.value} + '%'"></div>
+                <span class="skill-name" th:text="${entry.key}"></span>
+                <span class="skill-percent" th:text="${entry.value + '%' }"></span>
+            </div>
+            <div th:if="${entry.value == null}">
+                <span class="skill-name" th:text="${entry.key}"></span>
+                <span class="skill-percent">0%</span>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="section">
-    <h2>Weitere Angaben</h2>
-    <div class="data-row" th:if="${recommendation.cvChoice != null && !recommendation.cvChoice.isEmpty()}">
-        <div class="label">CV-Auswahl:</div>
-        <div class="value" th:text="${recommendation.cvChoice}"></div>
-    </div>
-    <div class="data-row" th:if="${recommendation.cvLink != null && !recommendation.cvLink.isEmpty()}">
-        <div class="label">CV-Link:</div>
-        <div class="value" th:text="${recommendation.cvLink}"></div>
-    </div>
-    <div class="data-row" th:if="${recommendation.personalityType != null && !recommendation.personalityType.isEmpty()}">
-        <div class="label">Persönlichkeitstyp:</div>
-        <div class="value" th:text="${recommendation.personalityType}"></div>
-    </div>
-    <div class="data-row" th:if="${recommendation.hobbies != null && !recommendation.hobbies.isEmpty()}">
-        <div class="label">Hobbys:</div>
-        <div class="value" th:text="${recommendation.hobbies}"></div>
-    </div>
-    <div class="data-row" th:if="${recommendation.projectExperience != null && !recommendation.projectExperience.isEmpty()}">
-        <div class="label">Projekterfahrung:</div>
-        <div class="value" th:text="${recommendation.projectExperience}"></div>
-    </div>
-    <div class="data-row" th:if="${recommendation.miscellaneous != null && !recommendation.miscellaneous.isEmpty()}">
-        <div class="label">Sonstiges:</div>
-        <div class="value" th:text="${recommendation.miscellaneous}"></div>
-    </div>
-</div>
+
+
+
+
+
+
+
+
+<!-- Analog für andere Skill-Kategorien -->
+
 </body>
 </html>

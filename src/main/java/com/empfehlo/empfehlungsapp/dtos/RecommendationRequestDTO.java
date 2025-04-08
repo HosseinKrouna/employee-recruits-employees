@@ -1,6 +1,7 @@
 package com.empfehlo.empfehlungsapp.dtos;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecommendationRequestDTO {
@@ -58,12 +59,14 @@ public class RecommendationRequestDTO {
     public static class SkillEntry {
         private String name;
         private int percentage;
+        private String technology;
 
         public SkillEntry() {}
 
-        public SkillEntry(String name, int percentage) {
+        public SkillEntry(String name, int percentage, String technology) {
             this.name = name;
             this.percentage = percentage;
+            this.technology = technology;
         }
 
         public String getName() { return name; }
@@ -71,7 +74,22 @@ public class RecommendationRequestDTO {
 
         public int getPercentage() { return percentage; }
         public void setPercentage(int percentage) { this.percentage = percentage; }
+
+        public String getTechnology() { return technology; }
+        public void setTechnology(String technology) { this.technology = technology; }
     }
+
+    private List<SkillEntry> otherSkills = new ArrayList<>();
+
+    public List<SkillEntry> getOtherSkills() {
+        return otherSkills;
+    }
+
+    public void setOtherSkills(List<SkillEntry> otherSkills) {
+        this.otherSkills = otherSkills;
+    }
+
+
 
 
 
