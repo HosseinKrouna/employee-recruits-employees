@@ -8,21 +8,19 @@ public class RecommendationResponseDTO {
     private String position;
     private String status;
     private String documentCvPath;
+    private String businessLink;
     private String documentPdfPath;
     private String submittedAt;
     private Long userId;
     private String recommendedByUsername;
-    private String cvChoice;
-    private String cvLink;
 
-    public String getCvChoice() { return cvChoice; }
-    public void setCvChoice(String cvChoice) { this.cvChoice = cvChoice; }
+    public String getBusinessLink() {
+        return businessLink;
+    }
 
-    public String getCvLink() { return cvLink; }
-    public void setCvLink(String cvLink) { this.cvLink = cvLink; }
-
-
-
+    public void setBusinessLink(String businessLink) {
+        this.businessLink = businessLink;
+    }
 
     public void setId(Long id) {
         this.id = id;

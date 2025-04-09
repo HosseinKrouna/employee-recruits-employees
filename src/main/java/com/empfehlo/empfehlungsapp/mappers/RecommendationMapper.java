@@ -17,13 +17,11 @@ public class RecommendationMapper {
         dto.setPosition(entity.getPosition());
         dto.setStatus(entity.getStatus());
         dto.setDocumentCvPath(entity.getDocumentCvPath());
+        dto.setBusinessLink(entity.getBusinessLink());
         dto.setDocumentPdfPath(entity.getDocumentPdfPath());
         dto.setSubmittedAt(entity.getSubmittedAt() != null
                 ? entity.getSubmittedAt().toString()
                 : null);
-
-        dto.setCvChoice(entity.getCvChoice());
-        dto.setCvLink(entity.getCvLink());
 
         if (entity.getRecommendedBy() != null) {
             User user = entity.getRecommendedBy();
@@ -40,8 +38,7 @@ public class RecommendationMapper {
         entity.setCandidateLastname(dto.getCandidateLastname());
         entity.setPosition(dto.getPosition());
         entity.setDocumentCvPath(dto.getDocumentCvPath());
-        entity.setCvChoice(dto.getCvChoice());
-        entity.setCvLink(dto.getCvLink());
+        entity.setBusinessLink(dto.getBusinessLink());
         entity.setDocumentPdfPath(dto.getDocumentPdfPath());
         entity.setStatus("Eingereicht"); // Defaultstatus
         entity.setSubmittedAt(LocalDateTime.now()); // Zeitpunkt setzen
