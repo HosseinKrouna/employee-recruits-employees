@@ -18,14 +18,21 @@ public class Recommendation {
     private String position;
     private String status;
     private String documentCvPath;
+    private String businessLink;
     private String documentPdfPath;
     private LocalDateTime submittedAt;
-    private String cvChoice;
-    private String cvLink;
 
     @JoinColumn(name = "user_id", nullable = false)
     private User recommendedBy;
 
+
+    public String getBusinessLink() {
+        return businessLink;
+    }
+
+    public void setBusinessLink(String businessLink) {
+        this.businessLink = businessLink;
+    }
 
     public Long getId() {
         return id;
@@ -83,11 +90,6 @@ public class Recommendation {
         this.documentPdfPath = documentPdfPath;
     }
 
-    public String getCvChoice() { return cvChoice; }
-    public void setCvChoice(String cvChoice) { this.cvChoice = cvChoice; }
-
-    public String getCvLink() { return cvLink; }
-    public void setCvLink(String cvLink) { this.cvLink = cvLink; }
 
     public LocalDateTime getSubmittedAt() {
         return submittedAt;
