@@ -4,14 +4,16 @@ public class LoginResponseDTO {
     private Long id;
     private String username;
     private String role;
+    private String token;
 
     // Konstruktoren
     public LoginResponseDTO() {}
 
-    public LoginResponseDTO(Long id, String username, String role) {
+    public LoginResponseDTO(Long id, String username, String role, String token) {
         this.id = id;
         this.username = username;
         this.role = role;
+        this.token = token;
     }
 
     // Getter & Setter
@@ -23,4 +25,7 @@ public class LoginResponseDTO {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 }

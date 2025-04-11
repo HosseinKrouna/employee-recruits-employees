@@ -251,10 +251,10 @@
     </p>
 
     <!-- Wenn Business-Profil-Link verwendet wurde -->
-    <div th:if="${recommendation.cvChoice == 'CV im Business-Profil-Link enthalten'} and ${recommendation.cvLink != null} and ${!#strings.isEmpty(recommendation.cvLink)}">
+    <div th:if="${recommendation.cvChoice == 'CV im Business-Profil-Link enthalten'} and ${recommendation.businessLink != null} and ${!#strings.isEmpty(recommendation.businessLink)}">
         <p>
             <strong>Business-Profil-Link:</strong>
-            <a th:href="${recommendation.cvLink}" th:text="${recommendation.cvLink}" target="_blank"></a>
+            <a th:href="${recommendation.businessLink}" th:text="${recommendation.businessLink}" target="_blank"></a>
         </p>
     </div>
 

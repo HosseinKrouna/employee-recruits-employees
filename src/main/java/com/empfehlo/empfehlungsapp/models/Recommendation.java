@@ -18,6 +18,7 @@ public class Recommendation {
     private String position;
     private String status;
     private String documentCvPath;
+    private String businessLink;
     private String documentPdfPath;
     private LocalDateTime submittedAt;
 
@@ -27,6 +28,14 @@ public class Recommendation {
     private User recommendedBy;
 
     // Getter & Setter
+
+    public String getBusinessLink() {
+        return businessLink;
+    }
+
+    public void setBusinessLink(String businessLink) {
+        this.businessLink = businessLink;
+    }
 
     public Long getId() {
         return id;
