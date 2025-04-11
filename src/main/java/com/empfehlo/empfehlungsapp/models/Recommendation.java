@@ -18,12 +18,21 @@ public class Recommendation {
     private String position;
     private String status;
     private String documentCvPath;
+    private String businessLink;
     private String documentPdfPath;
     private LocalDateTime submittedAt;
 
     @JoinColumn(name = "user_id", nullable = false)
     private User recommendedBy;
 
+
+    public String getBusinessLink() {
+        return businessLink;
+    }
+
+    public void setBusinessLink(String businessLink) {
+        this.businessLink = businessLink;
+    }
 
     public Long getId() {
         return id;

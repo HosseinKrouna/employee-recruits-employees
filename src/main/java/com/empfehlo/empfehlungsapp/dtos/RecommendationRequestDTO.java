@@ -49,7 +49,7 @@ public class RecommendationRequestDTO {
     private List<SkillEntry> customSkills;
 
     private String cvChoice;
-    private String cvLink;
+    private String businessLink;
     private String personalityType;
     private String hobbies;
     private String projectExperience;
@@ -360,12 +360,12 @@ public class RecommendationRequestDTO {
         this.cvChoice = cvChoice;
     }
 
-    public String getCvLink() {
-        return cvLink;
+    public String getBusinessLink() {
+        return businessLink;
     }
 
-    public void setCvLink(String cvLink) {
-        this.cvLink = cvLink;
+    public void setBusinessLink(String businessLink) {
+        this.businessLink = businessLink;
     }
 
     public String getPersonalityType() {

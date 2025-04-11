@@ -4,9 +4,15 @@ import com.empfehlo.empfehlungsapp.dtos.LoginResponseDTO;
 import com.empfehlo.empfehlungsapp.models.LoginRequest;
 import com.empfehlo.empfehlungsapp.models.User;
 import com.empfehlo.empfehlungsapp.repositories.UserRepository;
+import com.empfehlo.empfehlungsapp.security.JwtUtil;
+import com.empfehlo.empfehlungsapp.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,22 +53,29 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
-
-        if (userOptional.isEmpty() || !isPasswordValid(userOptional.get(), loginRequest.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten!");
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Ungültige Anmeldedaten!");
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Authentifizierungsfehler: " + e.getMessage());
         }
 
-        return ResponseEntity.ok(toLoginResponse(userOptional.get()));
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+
+        final String jwt = jwtUtil.generateToken(userDetails);
+
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(500).body("Benutzer nach Login nicht gefunden!");
+        }
+        User user = userOptional.get();
+
+        return ResponseEntity.ok(new LoginResponseDTO(user.getId(), user.getUsername(), user.getRole(), jwt));
     }
 
-    private boolean isPasswordValid(User user, String rawPassword) {
-        return passwordEncoder.matches(rawPassword, user.getPassword());
-    }
-
-    private LoginResponseDTO toLoginResponse(User user) {
-        return new LoginResponseDTO(user.getId(), user.getUsername(), user.getRole());
-    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -75,4 +88,5 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 }
