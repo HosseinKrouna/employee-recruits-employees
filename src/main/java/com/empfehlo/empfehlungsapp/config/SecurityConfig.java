@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/recommendations/user/**").hasAnyRole("HR", "MITARBEITER")
 
 
-                        .requestMatchers("/api/files/**").hasRole("HR")
+                        .requestMatchers("/api/files/**").hasAnyRole("HR", "MITARBEITER")
 
                         .anyRequest().authenticated()
                 )
