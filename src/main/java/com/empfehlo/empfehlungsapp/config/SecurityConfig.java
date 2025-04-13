@@ -65,7 +65,7 @@ public class SecurityConfig {
 
                         // 3. Datei-Endpunkte (Files)
                         // HR darf auf alle Dateioperationen zugreifen (download, download-generated)
-                        .requestMatchers("/api/files/**").hasRole("HR")
+                        .requestMatchers("/api/files/**").hasAnyRole("HR", "MITARBEITER")
 
                         // 4. Fallback: Alle anderen Anfragen erfordern Authentifizierung
                         .anyRequest().authenticated()
