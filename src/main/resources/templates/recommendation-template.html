@@ -36,6 +36,14 @@
             z-index: -1;
         }
 
+       td.label-wide { font-weight: bold; width: 20%; } /* z.B. nur 20% */
+       td.value-wide {
+                     width: 75%;
+                     white-space: nowrap; /* Verhindert jeglichen Zeilenumbruch */
+                     overflow: hidden; /* Verhindert, dass Text übersteht (wird abgeschnitten) */
+                     text-overflow: ellipsis; /* Zeigt "..." an, wenn Text abgeschnitten wird (optional) */
+                     }
+
         h2 { color: #008aff; border-bottom: 2px solid #f9a949; padding-bottom: 5px; font-size: 18px; margin-top: 30px; }
         h3 { font-size: 16px; margin-top: 2px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
@@ -45,6 +53,8 @@
         .checkbox-columns { display: flex; justify-content: space-between; gap: 40px; }
         .checkbox-column { display: flex; flex-direction: column; gap: 8px; }
         .checkbox-item { display: flex; align-items: center; }
+
+        .label-where-do-you-know {font-weight: bold;}
 
 .checkbox {
     font-family: Arial, sans-serif;
@@ -70,16 +80,14 @@
     margin-bottom: 5px;
 }
 
-
 .skill-bar {
-    position: relative;
-    background-color: #bfbfbf;
-    border: 1px solid #000000;
-    border-radius: 10px;
-    height: 24px;
+    position: relative; /* Wichtig für absolute Positionierung */
+    background-color: #e0e0e0;
+    border: 1px solid #c0c0c0;
+    border-radius: 10px; /* Dein Radius */
+    height: 24px; /* Höhe anpassen */
     margin: 5px 0 2px 0;
     overflow: hidden;
-    z-index: 2;
 }
 
 .skill-progress {
@@ -88,27 +96,58 @@
     left: 0;
     height: 100%;
     background-color: #008aff;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    z-index: -1;
+    border-top-left-radius: 9px; /* Etwas kleiner als Außenradius */
+    border-bottom-left-radius: 9px;
+    z-index: 1; /* Unter dem Text */
 }
 
-.skill-name,
-.skill-percent {
+.skill-name, .skill-percent {
     position: absolute;
-    top: 3px;
+    top: 3px; /* Vertikaler Abstand vom Rand */
     font-weight: bold;
-    color: #ffffff;
-    z-index: 3;
+    color: #ffffff; /* Weißer Text für Kontrast auf blauem Balken */
+    z-index: 2; /* Über dem Balken */
+    line-height: 18px; /* Zentriert Text vertikal (anpassen an height - 2*top) */
 }
 
-.skill-name { left: 10px; }
-.skill-percent { right: 10px; }
+.skill-name {
+    left: 10px; /* Abstand vom linken Rand */
+}
 
+.skill-percent {
+    right: 10px; /* Abstand vom rechten Rand */
+}
 
+.full-width-section {
+    margin-bottom: 15px; /* Abstand nach unten */
+}
+.full-width-section .label { /* Style für das Label in diesem Abschnitt */
+    font-weight: bold;
+    display: block; /* Label in eigene Zeile */
+    margin-bottom: 3px; /* Kleiner Abstand zum Wert */
+    color: #555; /* Etwas dezentere Farbe für das Label */
+}
+.full-width-section .value { /* Style für den Wert */
+    display: block; /* Wert in eigene Zeile */
+    width: 100%; /* Nutze volle Breite */
+    /* Optional: Einrücken oder anderer Stil */
+    /* padding-left: 10px; */
+    white-space: pre-wrap; /* Erhält Zeilenumbrüche aus dem Textarea */
+}
 
-        .page-break { page-break-before: always; }
+.eckdaten-item {
+    margin-bottom: 12px; /* Passe den Wert an, z.B. 10px, 15px etc. */
+    /* Optional: Füge auch einen margin-top hinzu, wenn du auch Abstand zur Überschrift willst */
+    /* margin-top: 5px; */
+}
+
+.page-break { page-break-before: always};
+
     </style>
+
+
+
+
 </head>
 <body>
 <div class="header">
@@ -122,7 +161,9 @@
 </div>
 
 <h2>Persönliche Infos des Kontaktes</h2>
+<!-- Tabelle für persönliche Infos -->
 <table>
+    <!-- Zeilen mit 4 Spalten -->
     <tr>
         <td class="label">Bevorzugte Position:</td>
         <td class="value" th:text="${recommendation.position}"></td>
@@ -135,23 +176,32 @@
         <td class="label">Nachname:</td>
         <td class="value" th:text="${recommendation.candidateLastname}"></td>
     </tr>
+    <!-- Zeilen mit 2 Spalten für mehr Platz -->
     <tr>
-        <td class="label">E-Mail:</td>
-        <td class="value" th:text="${recommendation.email}"></td>
-        <td class="label">Handynummer:</td>
-        <td class="value" th:text="${recommendation.phone}"></td>
+        <td class="label-wide">E-Mail:</td>
+        <td class="value-wide" th:text="${recommendation.email}"></td>
     </tr>
     <tr>
-        <td class="label">Woher kennt ihr euch?</td>
-        <td class="value" th:text="${recommendation.knownFrom}"></td>
-    </tr>
-    <tr>
-        <td class="label">Erstkontakt am:</td>
-        <td class="value" th:text="${contactDateFormatted}"></td>
-        <td class="label">Überzeugt am:</td>
-        <td class="value" th:text="${convincedDateFormatted}"></td>
+        <td class="label-wide">Handynummer:</td>
+        <td class="value-wide" th:text="${recommendation.phone}"></td>
     </tr>
 </table>
+
+<!-- "Woher kennt ihr euch?" -->
+<div class="full-width-section">
+    <span class="label-where-do-you-know">Woher kennt ihr euch?</span>
+    <span class="value" th:text="${recommendation.knownFrom}"></span>
+</div>
+
+        <div>
+            <span class="label">Erstkontakt am:</span>
+            <span class="value" th:text="${contactDateFormatted}"></span>
+            <span class="label">Überzeugt am:</span>
+            <span class="value" th:text="${convincedDateFormatted}"></span>
+        </div>
+
+
+
 
 <h2>Kontakt ist informiert zu:</h2>
 <div class="checkbox-columns">
@@ -203,47 +253,55 @@
 
 
 <h2>Eckdaten</h2>
+<div class="eckdaten-item" th:if="${recommendation.employmentStatus == 'In Anstellung'}">
+    <span class="label">Aktuelle Position:</span>
+    <span class="value" th:text="${recommendation.currentPosition}"></span>
+</div>
+<div class="eckdaten-item" th:if="${recommendation.employmentStatus == 'In Anstellung'}">
+    <span class="label">Karrierelevel:</span>
+    <span class="value" th:text="${recommendation.currentCareerLevel}"></span>
+</div>
+
+<div class="eckdaten-item" th:if="${recommendation.employmentStatus != 'In Anstellung'}">
+    <span class="label">Letzte Position:</span>
+    <span class="value" th:text="${recommendation.lastPosition}"></span>
+</div>
+<div class="eckdaten-item" th:if="${recommendation.employmentStatus != 'In Anstellung'}">
+    <span class="label">Letzter Karrierelevel:</span>
+    <span class="value" th:text="${recommendation.lastCareerLevel}"></span>
+</div>
+
+<div class="eckdaten-item">
+    <span class="label">Berufserfahrung (in Jahren):</span>
+    <span class="value" th:text="${recommendation.experienceYears}"></span>
+</div>
+
 <table>
-    <tr th:if="${recommendation.employmentStatus == 'In Anstellung'}">
-        <td class="label">Aktuelle Position:</td>
-        <td class="value" th:text="${recommendation.currentPosition}"></td>
-    </tr>
-    <tr th:if="${recommendation.employmentStatus == 'In Anstellung'}">
-        <td class="label">Karrierelevel:</td>
-        <td class="value" th:text="${recommendation.currentCareerLevel}"></td>
-    </tr>
-
-    <tr th:if="${recommendation.employmentStatus != 'In Anstellung'}">
-        <td class="label">Letzte Position:</td>
-        <td class="value" th:text="${recommendation.lastPosition}"></td>
-    </tr>
-    <tr th:if="${recommendation.employmentStatus != 'In Anstellung'}">
-        <td class="label">Letzter Karrierelevel:</td>
-        <td class="value" th:text="${recommendation.lastCareerLevel}"></td>
-    </tr>
-
-    <tr>
-        <td class="label">Berufserfahrung (in Jahren):</td>
-        <td class="value" th:text="${recommendation.experienceYears}"></td>
-    </tr>
     <tr>
         <td class="label">Kündigungsfrist:</td>
         <td class="value" th:text="${noticePeriodFormatted}"></td>
         <td class="label">Starttermin:</td>
         <td class="value" th:text="${startDateFormatted}"></td>
     </tr>
+</table>
+
+<table>
     <tr>
-        <td class="label">Gehaltsvorstellung (in €):</td>
+        <td class="label">Gehaltsvorstellung im Jahr (in €)</td>
+        <td class="label">Stundenanzahl (VZ/TZ)</td>
+        <td class="label">Reisebereitschaft (%)</td>
+    </tr>
+    <tr>
         <td class="value" th:text="${recommendation.salaryExpectation}"></td>
-        <td class="label">Stundenanzahl (VZ/TZ):</td>
         <td class="value" th:text="${recommendation.workHours}"></td>
-        <td class="label">Reisebereitschaft (%):</td>
         <td class="value" th:text="${recommendation.travelWillingness}"></td>
     </tr>
 </table>
 
 <div class="page-break"></div>
+
 <h2>Weitere Infos</h2>
+
 <div>
     <p>
         <strong>CV-Übermittlung:</strong>
@@ -270,34 +328,66 @@
 </div>
 
 
+<div class="page-break"></div>
+
 <h2>Skills (technologisch)</h2>
 <div th:each="categoryEntry : ${skillsMap}">
     <h3 class="skill-category" th:text="${categoryEntry.key}"></h3>
 
-    <div th:each="entry : ${categoryEntry.value}" th:if="${entry.key != 'Andere'}">
-        <div class="skill-bar">
-            <div th:if="${entry.value != null}">
-                <div class="skill-progress" th:style="'width:' + ${entry.value} + '%'"></div>
-                <span class="skill-name" th:text="${entry.key}"></span>
-                <span class="skill-percent" th:text="${entry.value + '%' }"></span>
+    <div th:if="${categoryEntry.value != null}" th:each="entry : ${categoryEntry.value}">
+        <div th:if="${entry != null}" class="skill-bar"> <!-- Stellt sicher, dass entry nicht null ist -->
+
+            <!-- Fortschrittsbalken (liegt im Hintergrund) -->
+            <div class="skill-progress"
+                 th:style="'width:' + ${(entry.value ?: 0)} + '%;'">
             </div>
-            <div th:if="${entry.value == null}">
-                <span class="skill-name" th:text="${entry.key}"></span>
-                <span class="skill-percent">0%</span>
-            </div>
+
+            <!-- Skill-Name (liegt darüber, links) -->
+            <span class="skill-name" th:text="${entry.key}"></span>
+
+            <!-- Skill-Prozent (liegt darüber, rechts) -->
+            <span class="skill-percent" th:text="${(entry.value ?: 0)} + '%'"></span>
+
         </div>
+        <!-- Fallback, falls entry doch mal null ist -->
+        <div th:if="${entry == null}">
+            <p style="color: red;">Fehler: Skill-Eintrag ist null.</p>
+        </div>
+    </div>
+    <!-- Fallback, falls Kategorie keine Skill-Map hat -->
+    <div th:if="${categoryEntry.value == null}">
+        <p style="color: red;">Fehler: Keine Skill-Daten für Kategorie <span th:text="${categoryEntry.key}"></span>.</p>
     </div>
 </div>
 
 
+<div class="page-break"></div>
+<h2>Sonstiges</h2>
 
+<!-- Persönlichkeitstyp -->
+<div class="full-width-section">
+    <span class="label">Persönlichkeitstyp DISG</span> <!-- Klammer korrigiert -->
+    <span class="value" th:text="${recommendation.personalityType}"></span>
+</div>
 
+<!-- Charakter / Hobbys -->
+<div class="full-width-section">
+    <span class="label">Charakter / Hobbys außerhalb vom Job</span>
+    <span class="value" th:text="${recommendation.hobbies}"></span>
+</div>
 
+<!-- Projekterfahrung -->
+<div class="full-width-section">
+    <span class="label">Projekterfahrung (sofern bekannt)</span>
+    <span class="value" th:text="${recommendation.projectExperience}"></span>
+</div>
 
+<!-- Sonstiges -->
+<div class="full-width-section">
+    <span class="label">Sonstiges</span>
+    <span class="value" th:text="${recommendation.miscellaneous}"></span>
+</div>
 
-
-
-<!-- Analog für andere Skill-Kategorien -->
 
 </body>
 </html>
