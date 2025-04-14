@@ -174,6 +174,22 @@ public class RecommendationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body("Neuer Status fehlt.");
+        }
+
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recommendation recommendation = recOpt.get();
+        recommendation.setStatus(newStatus);
+        recommendationRepository.save(recommendation);
+
+    }
+
     private void updateEntity(Recommendation existing, Recommendation details) {
         existing.setCandidateFirstname(details.getCandidateFirstname());
         existing.setCandidateLastname(details.getCandidateLastname());
