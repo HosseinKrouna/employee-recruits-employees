@@ -203,6 +203,27 @@ public class RecommendationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}/status") // Oder @PatchMapping
+// @PreAuthorize("hasRole('HR')") // Alternative Sicherung auf Methodenebene
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body("Neuer Status fehlt.");
+        }
+
+        // Hier Logik zum Finden und Aktualisieren der Empfehlung einfügen
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recommendation recommendation = recOpt.get();
+        // Optional: Prüfen ob der Status gültig ist (enum?)
+        recommendation.setStatus(newStatus);
+        recommendationRepository.save(recommendation);
+
+        return ResponseEntity.ok().build(); // Erfolg
+    }
+
     private void updateEntity(Recommendation existing, Recommendation details) {
         existing.setCandidateFirstname(details.getCandidateFirstname());
         existing.setCandidateLastname(details.getCandidateLastname());
