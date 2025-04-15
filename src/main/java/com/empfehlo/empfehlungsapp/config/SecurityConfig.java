@@ -49,6 +49,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/files/**").hasAnyRole("HR", "MITARBEITER")
 
+                        .requestMatchers(HttpMethod.PUT, "/api/recommendations/*/status").hasRole("HR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/recommendations/*/withdraw").hasRole("MITARBEITER")
                         .anyRequest().authenticated()
                 )
 

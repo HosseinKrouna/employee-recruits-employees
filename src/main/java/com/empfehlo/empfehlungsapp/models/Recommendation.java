@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 @Table(name = "recommendations")
 public class Recommendation {
 
+    public static final String STATUS_EINGEREICHT = "Eingereicht";
+    public static final String STATUS_IM_PROZESS = "Im Prozess";
+    public static final String STATUS_ABGESAGT = "Abgesagt";
+    public static final String STATUS_EINGESTELLT = "Eingestellt";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

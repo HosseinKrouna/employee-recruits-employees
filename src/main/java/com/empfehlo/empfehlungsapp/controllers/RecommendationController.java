@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_EINGEREICHT;
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_ZURUECKGEZOGEN;
+
 @RestController
 @RequestMapping("/api/recommendations")
 public class RecommendationController {
@@ -41,6 +44,33 @@ public class RecommendationController {
         this.pdfGeneratorService = pdfGeneratorService;
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
+    }
+
+    public ResponseEntity<?> withdrawRecommendation(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loggedInUserId = getUserIdFromAuthentication(authentication);
+        if (loggedInUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nicht authentifiziert.");
+        }
+
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empfehlung nicht gefunden.");
+        }
+        Recommendation recommendation = recOpt.get();
+
+        if (!recommendation.getRecommendedBy().getId().equals(loggedInUserId)) {
+            System.out.println("Zugriffsversuch (Zurückziehen) von User " + loggedInUserId + " auf Empfehlung " + id + " von User " + recommendation.getRecommendedBy().getId() + " blockiert.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Keine Berechtigung zum Zurückziehen dieser Empfehlung.");
+        }
+
+        if (!STATUS_EINGEREICHT.equals(recommendation.getStatus())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Empfehlung kann nur im Status '" + STATUS_EINGEREICHT + "' zurückgezogen werden.");
+        }
+
+        recommendation.setStatus(STATUS_ZURUECKGEZOGEN);
+        Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+
     }
 
     @PostMapping
@@ -172,6 +202,22 @@ public class RecommendationController {
                     return ResponseEntity.ok(recommendationRepository.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body("Neuer Status fehlt.");
+        }
+
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recommendation recommendation = recOpt.get();
+        recommendation.setStatus(newStatus);
+        recommendationRepository.save(recommendation);
+
     }
 
     private void updateEntity(Recommendation existing, Recommendation details) {
