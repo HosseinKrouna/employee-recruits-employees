@@ -7,6 +7,8 @@ import com.empfehlo.empfehlungsapp.models.User;
 
 import java.time.LocalDateTime;
 
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_EINGEREICHT;
+
 public class RecommendationMapper {
 
     public static RecommendationResponseDTO toDTO(Recommendation entity) {
@@ -40,7 +42,7 @@ public class RecommendationMapper {
         entity.setDocumentCvPath(dto.getDocumentCvPath());
         entity.setBusinessLink(dto.getBusinessLink());
         entity.setDocumentPdfPath(dto.getDocumentPdfPath());
-        entity.setStatus("Eingereicht"); // Defaultstatus
+        entity.setStatus(STATUS_EINGEREICHT); // Defaultstatus
         entity.setSubmittedAt(LocalDateTime.now()); // Zeitpunkt setzen
         entity.setRecommendedBy(user);
         return entity;

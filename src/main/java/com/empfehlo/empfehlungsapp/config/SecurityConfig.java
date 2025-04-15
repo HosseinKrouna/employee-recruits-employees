@@ -67,6 +67,10 @@ public class SecurityConfig {
                         // HR darf auf alle Dateioperationen zugreifen (download, download-generated)
                         .requestMatchers("/api/files/**").hasAnyRole("HR", "MITARBEITER")
 
+                        .requestMatchers(HttpMethod.PUT, "/api/recommendations/*/status").hasRole("HR")
+                        // .requestMatchers(HttpMethod.PATCH, "/api/recommendations/*/status").hasRole("HR")
+                        // Empfehlung zurückziehen nur MITARBEITER
+                        .requestMatchers(HttpMethod.PATCH, "/api/recommendations/*/withdraw").hasRole("MITARBEITER")
                         // 4. Fallback: Alle anderen Anfragen erfordern Authentifizierung
                         .anyRequest().authenticated()
                 )

@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_EINGEREICHT;
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_ZURUECKGEZOGEN;
+
 @RestController
 @RequestMapping("/api/recommendations")
 public class RecommendationController {
@@ -41,6 +44,43 @@ public class RecommendationController {
         this.pdfGeneratorService = pdfGeneratorService;
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
+    }
+
+    @PatchMapping("/{id}/withdraw") // NEUER ENDPUNKT
+    public ResponseEntity<?> withdrawRecommendation(@PathVariable Long id) {
+        // 1. Authentifizierung holen
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loggedInUserId = getUserIdFromAuthentication(authentication);
+        if (loggedInUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nicht authentifiziert.");
+        }
+
+        // 2. Empfehlung finden
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empfehlung nicht gefunden.");
+        }
+        Recommendation recommendation = recOpt.get();
+
+        // 3. Berechtigung prüfen: Ist der eingeloggte User der Ersteller?
+        if (!recommendation.getRecommendedBy().getId().equals(loggedInUserId)) {
+            // Verhindert, dass Mitarbeiter fremde Empfehlungen zurückziehen
+            System.out.println("Zugriffsversuch (Zurückziehen) von User " + loggedInUserId + " auf Empfehlung " + id + " von User " + recommendation.getRecommendedBy().getId() + " blockiert.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Keine Berechtigung zum Zurückziehen dieser Empfehlung.");
+        }
+
+        // 4. Status prüfen: Ist der Status "Eingereicht"?
+        if (!STATUS_EINGEREICHT.equals(recommendation.getStatus())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Empfehlung kann nur im Status '" + STATUS_EINGEREICHT + "' zurückgezogen werden.");
+        }
+
+        // 5. Status ändern und speichern
+        recommendation.setStatus(STATUS_ZURUECKGEZOGEN);
+        Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+
+        // 6. Erfolg melden (optional: das aktualisierte DTO zurückgeben)
+        // return ResponseEntity.ok().build(); // Einfache Erfolgsmeldung
+        return ResponseEntity.ok(RecommendationMapper.toDTO(savedRecommendation)); // Aktualisiertes DTO zurückgeben
     }
 
     @PostMapping
@@ -201,6 +241,27 @@ public class RecommendationController {
                     return ResponseEntity.ok(recommendationRepository.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/status") // Oder @PatchMapping
+// @PreAuthorize("hasRole('HR')") // Alternative Sicherung auf Methodenebene
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body("Neuer Status fehlt.");
+        }
+
+        // Hier Logik zum Finden und Aktualisieren der Empfehlung einfügen
+        Optional<Recommendation> recOpt = recommendationRepository.findById(id);
+        if (recOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recommendation recommendation = recOpt.get();
+        // Optional: Prüfen ob der Status gültig ist (enum?)
+        recommendation.setStatus(newStatus);
+        recommendationRepository.save(recommendation);
+
+        return ResponseEntity.ok().build(); // Erfolg
     }
 
     private void updateEntity(Recommendation existing, Recommendation details) {
