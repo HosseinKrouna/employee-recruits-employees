@@ -7,6 +7,8 @@ import com.empfehlo.empfehlungsapp.models.User;
 
 import java.time.LocalDateTime;
 
+import static com.empfehlo.empfehlungsapp.models.Recommendation.STATUS_EINGEREICHT;
+
 public class RecommendationMapper {
 
     public static RecommendationResponseDTO toDTO(Recommendation entity) {
