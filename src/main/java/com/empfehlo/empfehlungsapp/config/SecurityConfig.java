@@ -3,6 +3,7 @@ package com.empfehlo.empfehlungsapp.config;
 import com.empfehlo.empfehlungsapp.security.JwtRequestFilter;
 import com.empfehlo.empfehlungsapp.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,9 @@ public class SecurityConfig {
         http
 
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(EndpointRequest.to("health")).permitAll()
+
                         .requestMatchers("/api/users/login", "/api/users/register-employee", "/api/users/register-hr").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/recommendations").hasRole("MITARBEITER")
