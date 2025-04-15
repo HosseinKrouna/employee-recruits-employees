@@ -3,6 +3,7 @@ package com.empfehlo.empfehlungsapp.config;
 import com.empfehlo.empfehlungsapp.security.JwtRequestFilter;
 import com.empfehlo.empfehlungsapp.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod; // <-- Wichtig: HttpMethod importieren
@@ -43,6 +44,13 @@ public class SecurityConfig {
 
                 // Autorisierungsregeln definieren (WICHTIG: Die Reihenfolge ist entscheidend!)
                 .authorizeHttpRequests(auth -> auth
+
+                        // --- NEU: Actuator Health Endpunkt erlauben ---
+                        // Erlaube JEDEM den Zugriff auf den Health-Endpunkt
+                        .requestMatchers(EndpointRequest.to("health")).permitAll()
+                        // Optional: Wenn du ALLE Actuator-Endpunkte freigeben willst (weniger sicher):
+                        // .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
+
                         // 1. Öffentliche Endpunkte (Login, Registrierung)
                         .requestMatchers("/api/users/login", "/api/users/register-employee", "/api/users/register-hr").permitAll()
 
