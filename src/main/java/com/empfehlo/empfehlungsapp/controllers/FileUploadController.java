@@ -1,5 +1,6 @@
 package com.empfehlo.empfehlungsapp.controllers;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,10 +12,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+
 
 @RestController
 @RequestMapping("/api/files")
 public class FileUploadController {
+
+    @PostConstruct
+    public void logInit() {
+        log.info("✅ FileUploadController wurde korrekt geladen!");
+    }
+
 
     private static final Logger log = LoggerFactory.getLogger(FileUploadController.class);
 
@@ -30,7 +40,13 @@ public class FileUploadController {
         try {
             String uniqueFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path targetPath = Paths.get(uploadDir).resolve(uniqueFilename);
-            Files.copy(file.getInputStream(), targetPath);
+            log.info("🛠 Speicherort: {}", targetPath.toAbsolutePath());
+
+            Files.createDirectories(targetPath.getParent());
+            log.info("📝 Upload-Zielpfad: {}", targetPath.toAbsolutePath());
+            log.info("📂 Zielpfad für Upload: " + targetPath.toAbsolutePath());
+
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
             return ResponseEntity.ok(uniqueFilename);
         } catch (IOException e) {
