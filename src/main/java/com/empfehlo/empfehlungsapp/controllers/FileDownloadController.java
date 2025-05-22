@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,17 +26,20 @@ public class FileDownloadController {
     @Value("${app.upload.dir}")
     private String uploadDir;
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-        Path filePath = Paths.get(uploadDir).resolve(filename);
+    @GetMapping("/download/{filename:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("filename") String filename) {
+//        log.info("📥 Download-Methode aufgerufen mit Filename: {}", filename);
 
-        if (Files.notExists(filePath)) {
-            return ResponseEntity.notFound().build();
-        }
 
         try {
-            Resource resource = new UrlResource(filePath.toUri());
+            String decodedFilename = java.net.URLDecoder.decode(filename, StandardCharsets.UTF_8);
+            Path filePath = Paths.get(uploadDir).resolve(decodedFilename);
 
+            if (Files.notExists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Resource resource = new UrlResource(filePath.toUri());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .contentType(MediaType.APPLICATION_PDF)
@@ -48,6 +52,7 @@ public class FileDownloadController {
             log.error("Fehler beim Abrufen der Datei", e);
             return ResponseEntity.internalServerError().build();
         }
+
     }
 
     @GetMapping("/download-generated/{filename}")
