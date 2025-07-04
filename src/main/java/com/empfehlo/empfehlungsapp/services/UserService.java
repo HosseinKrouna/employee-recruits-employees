@@ -22,6 +22,7 @@ public class UserService {
 
     public User registerUser(String username, String password, String role) {
         if (userExists(username)) {
+            return null;
         }
         String hashedPassword = passwordEncoder.encode(password);
         User newUser = new User(username, hashedPassword, role);

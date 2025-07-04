@@ -51,9 +51,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                System.out.println("JWT validiert für Benutzer: " + username);
             } else {
+                System.out.println("JWT ungültig für Benutzer: " + username);
             }
         } else if (username == null && jwt != null) {
+            System.out.println("JWT vorhanden, aber Benutzername konnte nicht extrahiert werden.");
         }
+        chain.doFilter(request, response);
     }
 }

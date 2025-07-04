@@ -1,8 +1,10 @@
+package com.empfehlo.empfehlungsapp.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,7 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
+    private SecretKey secretKey;
 
     @PostConstruct
     protected void init() {
@@ -42,6 +45,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -78,11 +82,19 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         try {
+
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             System.err.println("JWT ist abgelaufen: " + e.getMessage());
             return null;
+        } catch (io.jsonwebtoken.JwtException e) {
             System.err.println("Fehler beim Parsen/Validieren des JWT: " + e.getMessage());
             return null;
+        } catch (IllegalArgumentException e) {
             System.err.println("Ungültiges Token-Argument: " + e.getMessage());
             return null;
         }

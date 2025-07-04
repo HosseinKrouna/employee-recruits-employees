@@ -25,6 +25,9 @@ public class UserController {
 
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private CustomUserDetailsService userDetailsService;
+    @Autowired private JwtUtil jwtUtil;
 
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(@RequestBody User user) {

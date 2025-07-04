@@ -46,7 +46,6 @@ public class RecommendationController {
         this.userRepository = userRepository;
     }
 
-    @PatchMapping("/{id}/withdraw")
     public ResponseEntity<?> withdrawRecommendation(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long loggedInUserId = getUserIdFromAuthentication(authentication);
@@ -86,7 +85,6 @@ public class RecommendationController {
             System.out.println("Warnung: UserId im DTO (" + dto.getUserId() + ") ignoriert, verwende eingeloggte UserID (" + loggedInUserId + ")");
         }
 
-        Optional<User> userOpt = userRepository.findById(loggedInUserId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentifizierter Benutzer nicht in DB gefunden.");
         }
@@ -113,7 +111,6 @@ public class RecommendationController {
     public ResponseEntity<List<RecommendationResponseDTO>> getAll() {
         List<RecommendationResponseDTO> dtos = recommendationRepository.findAll().stream()
                 .map(RecommendationMapper::toDTO)
-                .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
@@ -136,7 +133,6 @@ public class RecommendationController {
 
         if (!isHr && !loggedInUserId.equals(userId)) {
             System.out.println("Zugriffsversuch von Mitarbeiter " + loggedInUserId + " auf Daten von User " + userId + " blockiert.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Zugriff verweigert.");
         }
 
         Optional<User> targetUserOpt = userRepository.findById(userId);
@@ -150,8 +146,14 @@ public class RecommendationController {
         return ResponseEntity.ok(dtos);
     }
 
-
-
+    /**
+     * Extrahiert die numerische Benutzer-ID des aktuell authentifizierten Benutzers.
+     * Liest den Benutzernamen aus dem Authentication-Objekt und sucht den
+     * Benutzer im Repository, um dessen ID zu erhalten.
+     *
+     * @param authentication Das Authentication-Objekt aus dem SecurityContext.
+     * @return Die Long ID des Benutzers oder null, wenn nicht authentifiziert oder Benutzer nicht gefunden wurde.
+     */
     private Long getUserIdFromAuthentication(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() == null) {
             System.err.println("Versuch, UserID von nicht authentifiziertem oder null Principal zu holen.");
@@ -194,7 +196,6 @@ public class RecommendationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRecommendation(@PathVariable Long id, @RequestBody Recommendation recommendationDetails) {
-        // TODO: Berechtigungsprüfung hinzufügen!
         return recommendationRepository.findById(id)
                 .map(existing -> {
                     updateEntity(existing, recommendationDetails);
@@ -203,7 +204,6 @@ public class RecommendationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
         String newStatus = statusUpdate.get("status");
         if (newStatus == null || newStatus.isBlank()) {
@@ -218,7 +218,6 @@ public class RecommendationController {
         recommendation.setStatus(newStatus);
         recommendationRepository.save(recommendation);
 
-        return ResponseEntity.ok().build();
     }
 
     private void updateEntity(Recommendation existing, Recommendation details) {
@@ -230,7 +229,6 @@ public class RecommendationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id) {
-        // TODO: Berechtigungsprüfung hinzufügen! (z.B. nur HR)
         if (recommendationRepository.existsById(id)) {
             recommendationRepository.deleteById(id);
             return ResponseEntity.noContent().build();

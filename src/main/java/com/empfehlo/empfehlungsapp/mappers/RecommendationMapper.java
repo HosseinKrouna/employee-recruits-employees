@@ -42,6 +42,8 @@ public class RecommendationMapper {
         entity.setDocumentCvPath(dto.getDocumentCvPath());
         entity.setBusinessLink(dto.getBusinessLink());
         entity.setDocumentPdfPath(dto.getDocumentPdfPath());
+        entity.setStatus(STATUS_EINGEREICHT);
+        entity.setSubmittedAt(LocalDateTime.now());
         entity.setRecommendedBy(user);
         return entity;
     }

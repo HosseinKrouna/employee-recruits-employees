@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PdfGeneratorService {
@@ -42,9 +44,7 @@ public class PdfGeneratorService {
         this.templateEngine = templateEngine;
     }
 
-    /**
-     * Generiert das PDF für eine Empfehlung, inklusive aufbereiteter Skill-Map.
-     */
+
     public byte[] generateRecommendationPdf(RecommendationRequestDTO dto) throws DocumentException, IOException {
         Context context = new Context();
 
@@ -112,8 +112,11 @@ public class PdfGeneratorService {
 
         if (dto.getCustomSkills() != null && !dto.getCustomSkills().isEmpty()) {
             for (RecommendationRequestDTO.SkillEntry customSkill : dto.getCustomSkills()) {
+                if (customSkill.getName() == null || customSkill.getName().isBlank()) continue;
 
                 String categoryKey = (customSkill.getTechnology() != null && !customSkill.getTechnology().isBlank())
+                        ? customSkill.getTechnology().trim()
+                        : "Sonstige individuelle Skills";
 
                 Map<String, Integer> categoryMap = finalSkillsMap.computeIfAbsent(categoryKey, k -> new LinkedHashMap<>());
 
@@ -124,10 +127,7 @@ public class PdfGeneratorService {
         return finalSkillsMap;
     }
 
-    /**
-     * Verarbeitet eine Liste von Skill-Einträgen für eine bestimmte Kategorie,
-     * trennt Standard-Skills von "Anderen" Skills.
-     */
+
     private void processSkillCategory(List<RecommendationRequestDTO.SkillEntry> skills,
                                       String categoryName,
                                       Map<String, Integer> standardSkillsTargetMap,
@@ -135,8 +135,12 @@ public class PdfGeneratorService {
         if (skills == null) return;
 
         for (RecommendationRequestDTO.SkillEntry skill : skills) {
+            if (skill == null || skill.getName() == null) continue;
 
             if (isOtherSkillEntry(skill, categoryName)) {
+
+                if (!skill.getName().isBlank()){
+                    otherSkillsTargetMap.put(skill.getName(), skill);
                 }
             } else {
                 standardSkillsTargetMap.put(skill.getName(), skill.getPercentage());
@@ -144,38 +148,29 @@ public class PdfGeneratorService {
         }
     }
 
-    /**
-     * Hilfsmethode, um zu prüfen, ob ein SkillEntry der "Andere"-Eintrag für eine Kategorie ist.
-     * Aktuelle Annahme: Ein Skill ist "Andere", wenn sein Name NICHT in der vordefinierten Liste ist.
-     * Passe diese Logik bei Bedarf an!
-     */
+
     private boolean isOtherSkillEntry(RecommendationRequestDTO.SkillEntry entry, String categoryName) {
         if (entry == null || entry.getName() == null) return false;
         List<String> predefined = PREDEFINED_SKILLS_BY_CATEGORY.getOrDefault(categoryName, Collections.emptyList());
         return !predefined.stream().anyMatch(predef -> predef.equalsIgnoreCase(entry.getName()));
     }
 
-    /**
-     * Versucht, die ursprüngliche vordefinierte Kategorie für einen "Anderen"-Skill zu bestimmen.
-     * Diese Methode ist nötig, um "Andere"-Skills korrekt zuzuordnen.
-     * Sie ist hier nur eine einfache Annahme - sie muss evtl. verbessert werden,
-     * z.B. indem der "Technology"-String im DTO die Kategorie enthält.
-     */
+
     private String determineCategoryForOtherSkill(RecommendationRequestDTO.SkillEntry otherSkill) {
         for (Map.Entry<String, List<String>> categoryEntry : PREDEFINED_SKILLS_BY_CATEGORY.entrySet()) {
             if (isOtherSkillEntry(otherSkill, categoryEntry.getKey())) {
                 boolean inAnyOtherList = PREDEFINED_SKILLS_BY_CATEGORY.entrySet().stream()
+                        .filter(e -> !e.getKey().equals(categoryEntry.getKey()))
                         .anyMatch(e -> e.getValue().stream().anyMatch(s -> s.equalsIgnoreCase(otherSkill.getName())));
                 if (!inAnyOtherList) {
+                    return categoryEntry.getKey();
                 }
             }
         }
+        return null;
     }
 
 
-    /**
-     * Generiert das PDF aus dem gegebenen HTML-String.
-     */
     private byte[] generatePdfFromHtml(String html) throws DocumentException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ITextRenderer renderer = new ITextRenderer();
@@ -184,6 +179,7 @@ public class PdfGeneratorService {
             baseResource = PdfGeneratorService.class.getClassLoader().getResource("static/");
             if (baseResource == null) {
                 System.err.println("WARNUNG: Basisverzeichnis /static/ fuer PDF-Ressourcen nicht gefunden!");
+                renderer.setDocumentFromString(html);
             } else {
                 renderer.setDocumentFromString(html, baseResource.toExternalForm());
             }
@@ -195,24 +191,18 @@ public class PdfGeneratorService {
         return outputStream.toByteArray();
     }
 
-    /**
-     * Gibt die Thymeleaf TemplateEngine zurück (nützlich für den PreviewController).
-     */
+
     public TemplateEngine getTemplateEngine() {
         return templateEngine;
     }
 
-    /**
-     * Generiert das PDF und speichert es im Dateisystem.
-     * @param dto Die Empfehlungsdaten.
-     * @return Den Dateinamen (nicht den Pfad) der gespeicherten Datei.
-     * @throws DocumentException Bei Fehlern während der PDF-Erstellung.
-     * @throws IOException Bei Fehlern beim Speichern der Datei.
-     */
+
     public String generateAndStorePdf(RecommendationRequestDTO dto) throws DocumentException, IOException {
+        byte[] pdfContent = generateRecommendationPdf(dto);
 
         Path generatedDir = Paths.get(System.getProperty("user.dir"), "generatedPdf");
         if (Files.notExists(generatedDir)) {
+            Files.createDirectories(generatedDir);
         }
 
         String candidateName = (dto.getCandidateFirstname() != null ? dto.getCandidateFirstname() : "")
@@ -223,5 +213,7 @@ public class PdfGeneratorService {
         Path pdfPath = generatedDir.resolve(filename);
 
         Files.write(pdfPath, pdfContent);
+        System.out.println("PDF gespeichert unter: " + pdfPath.toAbsolutePath()); // Logge den Pfad
+        return filename;
     }
 }

@@ -13,6 +13,7 @@ public class Recommendation {
     public static final String STATUS_IM_PROZESS = "Im Prozess";
     public static final String STATUS_ABGESAGT = "Abgesagt";
     public static final String STATUS_EINGESTELLT = "Eingestellt";
+    public static final String STATUS_ZURUECKGEZOGEN = "Zurückgezogen";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,9 @@ public class Recommendation {
     private String documentPdfPath;
     private LocalDateTime submittedAt;
 
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"password", "role"})
     private User recommendedBy;
 
 

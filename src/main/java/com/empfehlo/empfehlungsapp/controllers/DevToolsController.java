@@ -26,6 +26,8 @@ public class DevToolsController {
 
     @DeleteMapping("/reset-users")
     public ResponseEntity<String> resetUsersOnly() {
+        recommendationRepository.deleteAll();
+        userRepository.deleteAll();
         return ResponseEntity.ok("✅ Benutzer & zugehörige Empfehlungen gelöscht.");
     }
 
