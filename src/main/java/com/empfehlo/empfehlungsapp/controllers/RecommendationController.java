@@ -71,6 +71,7 @@ public class RecommendationController {
 
         recommendation.setStatus(STATUS_ZURUECKGEZOGEN);
         Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+        return ResponseEntity.ok(savedRecommendation);
 
     }
 
